@@ -15,6 +15,23 @@ The Databricks notebook:
 
 The default analysis endpoint is `databricks-qwen35-122b-a10b`, with configurable fallbacks. Change it in the notebook settings or job parameters when the endpoint is unavailable in a workspace.
 
+## Manual Databricks upload
+
+This is the recommended setup when Databricks CLI access is not available.
+
+1. [Download the repository as a ZIP file](https://github.com/reggie-db/dbx-metadata-generator/archive/refs/heads/main.zip).
+2. In Databricks, open **Workspace** and navigate to the folder where the notebook should be installed.
+3. Select **Import**, choose the downloaded ZIP file, and import it as an archive.
+4. Open `notebooks/semantic_metadata_generator` from the imported folder.
+5. Connect the notebook to serverless compute.
+6. In the first cell, set `include` to a narrow catalog, schema, table, or pattern. Keep `dry_run=true` for the first run.
+7. Run all cells and follow the timestamped progress messages in the notebook output.
+8. Review the final proposal table. Set `dry_run=false` only after the proposed comments have been reviewed.
+
+Import the repository ZIP rather than only the `.ipynb` file. The notebook loads helper modules from the included `src` directory.
+
+The user running the notebook needs access to the selected Unity Catalog tables and the configured model endpoint. Applying comments also requires permission to modify the selected tables' metadata.
+
 ## Selector syntax
 
 Selectors accept `*`, `?`, character groups, and SQL-style `%` wildcards.
@@ -34,7 +51,7 @@ Raw sample rows exist only in notebook-process memory while a summary request is
 
 The model still receives sampled values. Review workspace governance requirements before scanning sensitive tables, and use include/exclude selectors to constrain scope.
 
-## Deploy the test job
+## Automated deployment
 
 Use an explicitly configured Databricks CLI profile:
 
