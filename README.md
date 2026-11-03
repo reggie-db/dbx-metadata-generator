@@ -9,6 +9,7 @@ The Databricks notebook:
 - captures existing descriptions, column metadata, owners, and tags;
 - samples a small number of rows at random without persisting or printing them;
 - asks an open-weight Databricks model to summarize each sample without reproducing raw records;
+- emits timestamped JSON progress logs for discovery, scanning, model calls, proposals, and apply operations;
 - builds `TABLE_CONTEXTS` and `PROPOSED_CHANGES` dictionaries;
 - applies high-confidence comments only when `dry_run=false`.
 
@@ -54,6 +55,7 @@ Open `notebooks/semantic_metadata_generator.ipynb` in Databricks and edit the fi
 - `max_tables=25` and `sample_rows=8`: bound cost and runtime;
 - `include_views=false`: scan managed, external, and foreign tables only;
 - `min_apply_confidence=0.85`: minimum confidence when application is enabled.
+- `log_level=INFO`: emit progress events; use `WARNING` or `ERROR` for quieter runs.
 
 Set `dry_run=false` only after reviewing the displayed proposal table and narrowing the include selectors.
 

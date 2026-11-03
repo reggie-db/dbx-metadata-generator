@@ -29,11 +29,19 @@ class NotebookContractTest(unittest.TestCase):
         self.assertIn('"dry_run": "true"', self.source)
         self.assertIn('"include": "[]"', self.source)
         self.assertIn('"model_endpoint": "databricks-qwen35-122b-a10b"', self.source)
+        self.assertIn('"log_level": "INFO"', self.source)
 
     def test_samples_are_not_saved_in_context(self) -> None:
         self.assertIn("sample_rows.clear()", self.source)
         self.assertIn('metadata["sample_summary"] = sample_summary', self.source)
         self.assertNotIn('"sample_rows": sample_rows', self.source)
+
+    def test_progress_logging_covers_execution_stages(self) -> None:
+        self.assertIn("def progress(", self.source)
+        self.assertIn('progress("discovery", "Discovering visible Unity Catalog relations"', self.source)
+        self.assertIn('progress("model", "Calling model endpoint"', self.source)
+        self.assertIn('"Dry run enabled; no comments will be applied"', self.source)
+        self.assertIn('"Metadata generation finished"', self.source)
 
     def test_python_cells_compile(self) -> None:
         for index, source in enumerate(self.code_cells, start=1):

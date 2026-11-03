@@ -23,6 +23,7 @@ resources:
               column_batch_size: "30"
               min_apply_confidence: "0.85"
               evolve_existing_comments: "true"
+              log_level: INFO
           environment_key: serverless
       environments:
         - environment_key: serverless
