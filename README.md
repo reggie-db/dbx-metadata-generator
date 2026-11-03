@@ -47,7 +47,7 @@ The included test job runs a dry analysis of `samples.nyctaxi.trips`, scans one 
 
 ## Run the notebook directly
 
-Open `notebooks/semantic_metadata_generator.py` in Databricks and edit the first cell or its widgets. Important defaults:
+Open `notebooks/semantic_metadata_generator.ipynb` in Databricks and edit the first cell or its widgets. Important defaults:
 
 - `include=[]`: scan all visible, supported tables up to `max_tables`;
 - `dry_run=true`: produce proposals without applying comments;
@@ -63,5 +63,7 @@ The selector library uses only the Python standard library:
 
 ```bash
 PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
-.venv/bin/python -m py_compile notebooks/semantic_metadata_generator.py src/dbx_metadata_generator/*.py
+.venv/bin/python -m py_compile src/dbx_metadata_generator/*.py
 ```
+
+The notebook contract test parses the Jupyter file and compiles every Python code cell.

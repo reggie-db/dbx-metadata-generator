@@ -8,7 +8,7 @@ resources:
       tasks:
         - task_key: analyze_sample_table
           notebook_task:
-            notebook_path: ../notebooks/semantic_metadata_generator.py
+            notebook_path: ../notebooks/semantic_metadata_generator.ipynb
             base_parameters:
               include: '["samples.nyctaxi.trips"]'
               exclude: '[]'

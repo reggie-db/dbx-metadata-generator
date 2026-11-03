@@ -1,17 +1,29 @@
+import json
 import unittest
 from pathlib import Path
 
 
-NOTEBOOK = Path(__file__).parents[1] / "notebooks" / "semantic_metadata_generator.py"
+NOTEBOOK = Path(__file__).parents[1] / "notebooks" / "semantic_metadata_generator.ipynb"
 
 
 class NotebookContractTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.source = NOTEBOOK.read_text()
+        cls.notebook = json.loads(NOTEBOOK.read_text())
+        cls.code_cells = [
+            "".join(cell["source"])
+            for cell in cls.notebook["cells"]
+            if cell["cell_type"] == "code"
+        ]
+        cls.source = "\n".join(cls.code_cells)
 
-    def test_is_databricks_source_notebook(self) -> None:
-        self.assertTrue(self.source.startswith("# Databricks notebook source\n"))
+    def test_is_jupyter_notebook(self) -> None:
+        self.assertEqual(self.notebook["nbformat"], 4)
+        self.assertEqual(self.notebook["metadata"]["language_info"]["name"], "python")
+
+    def test_first_cell_contains_settings(self) -> None:
+        self.assertEqual(self.notebook["cells"][0]["cell_type"], "code")
+        self.assertIn("DEFAULTS = {", "".join(self.notebook["cells"][0]["source"]))
 
     def test_safe_defaults_are_present(self) -> None:
         self.assertIn('"dry_run": "true"', self.source)
@@ -22,6 +34,11 @@ class NotebookContractTest(unittest.TestCase):
         self.assertIn("sample_rows.clear()", self.source)
         self.assertIn('metadata["sample_summary"] = sample_summary', self.source)
         self.assertNotIn('"sample_rows": sample_rows', self.source)
+
+    def test_python_cells_compile(self) -> None:
+        for index, source in enumerate(self.code_cells, start=1):
+            with self.subTest(cell=index):
+                compile(source, f"{NOTEBOOK.name}:cell-{index}", "exec")
 
 
 if __name__ == "__main__":
