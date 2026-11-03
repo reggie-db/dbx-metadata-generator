@@ -1,0 +1,30 @@
+resources:
+  jobs:
+    metadata_generator_test:
+      name: "[${bundle.target}] dbx-metadata-generator test"
+      description: "Dry-run semantic metadata generation against one sample table."
+      max_concurrent_runs: 1
+      timeout_seconds: 1800
+      tasks:
+        - task_key: analyze_sample_table
+          notebook_task:
+            notebook_path: ../notebooks/semantic_metadata_generator.py
+            base_parameters:
+              include: '["samples.nyctaxi.trips"]'
+              exclude: '[]'
+              model_endpoint: databricks-qwen35-122b-a10b
+              model_fallbacks: '["databricks-gpt-oss-120b"]'
+              dry_run: "true"
+              include_views: "false"
+              max_tables: "1"
+              sample_rows: "3"
+              max_sample_columns: "20"
+              max_cell_chars: "160"
+              column_batch_size: "30"
+              min_apply_confidence: "0.85"
+              evolve_existing_comments: "true"
+          environment_key: serverless
+      environments:
+        - environment_key: serverless
+          spec:
+            client: "4"

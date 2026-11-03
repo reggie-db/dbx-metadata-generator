@@ -1,0 +1,25 @@
+# Databricks Asset Bundle (DAB) configuration.
+# Bundle name matches the uv project name.
+# Host and profile are intentionally omitted -- set them via the CLI env
+# (DATABRICKS_HOST / `databricks auth login`) or a profile flag at deploy time.
+
+bundle:
+  name: dbx-metadata-generator
+
+include:
+  - resources/*.yml
+
+sync:
+  include:
+    - notebooks/**
+    - src/**
+  exclude:
+    - tests/**
+    - .github/**
+
+targets:
+  dev:
+    mode: development
+    default: true
+    workspace:
+      root_path: /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}

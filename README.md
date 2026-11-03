@@ -1,0 +1,67 @@
+# dbx-metadata-generator
+
+Generate confidence-scored Unity Catalog table and column comment proposals from schema metadata and ephemeral random samples.
+
+The Databricks notebook:
+
+- accepts include and exclude selectors for catalogs, schemas, tables, and glob patterns;
+- discovers accessible Unity Catalog relations through `system.information_schema`;
+- captures existing descriptions, column metadata, owners, and tags;
+- samples a small number of rows at random without persisting or printing them;
+- asks an open-weight Databricks model to summarize each sample without reproducing raw records;
+- builds `TABLE_CONTEXTS` and `PROPOSED_CHANGES` dictionaries;
+- applies high-confidence comments only when `dry_run=false`.
+
+The default analysis endpoint is `databricks-qwen35-122b-a10b`, with configurable fallbacks. Change it in the notebook settings or job parameters when the endpoint is unavailable in a workspace.
+
+## Selector syntax
+
+Selectors accept `*`, `?`, character groups, and SQL-style `%` wildcards.
+
+| Selector | Matches |
+| --- | --- |
+| `main` | Every table in catalog `main` |
+| `main.sales` | Every table in `main.sales` |
+| `main.sales.orders` | One exact table |
+| `prod*.sales?.order%` | A three-part pattern |
+
+An empty include list means all visible relations. Exclusions always win. The notebook excludes `system.*.*` and `__databricks_internal.*.*` by default.
+
+## Data handling
+
+Raw sample rows exist only in notebook-process memory while a summary request is made. They are not written to tables, volumes, files, logs, notebook output, `TABLE_CONTEXTS`, or `PROPOSED_CHANGES`. The model prompt explicitly instructs the model not to reproduce unique identifiers, personal data, secrets, or complete rows.
+
+The model still receives sampled values. Review workspace governance requirements before scanning sensitive tables, and use include/exclude selectors to constrain scope.
+
+## Deploy the test job
+
+Use an explicitly configured Databricks CLI profile:
+
+```bash
+databricks bundle validate --strict --target dev --profile MY-PROFILE
+databricks bundle deploy --target dev --profile MY-PROFILE
+databricks bundle run metadata_generator_test --target dev --profile MY-PROFILE
+```
+
+The included test job runs a dry analysis of `samples.nyctaxi.trips`, scans one table, and applies no metadata changes.
+
+## Run the notebook directly
+
+Open `notebooks/semantic_metadata_generator.py` in Databricks and edit the first cell or its widgets. Important defaults:
+
+- `include=[]`: scan all visible, supported tables up to `max_tables`;
+- `dry_run=true`: produce proposals without applying comments;
+- `max_tables=25` and `sample_rows=8`: bound cost and runtime;
+- `include_views=false`: scan managed, external, and foreign tables only;
+- `min_apply_confidence=0.85`: minimum confidence when application is enabled.
+
+Set `dry_run=false` only after reviewing the displayed proposal table and narrowing the include selectors.
+
+## Local checks
+
+The selector library uses only the Python standard library:
+
+```bash
+PYTHONPATH=src .venv/bin/python -m unittest discover -s tests -v
+.venv/bin/python -m py_compile notebooks/semantic_metadata_generator.py src/dbx_metadata_generator/*.py
+```

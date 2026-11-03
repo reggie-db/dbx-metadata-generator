@@ -1,0 +1,85 @@
+# ---- Secrets / environment ----------------------------------------------
+.env
+.env.*
+*.env
+.envrc
+secrets.*
+*.secret
+
+# ---- Lock files (may embed local proxy URLs / creds -- do not commit) -----
+uv.lock
+poetry.lock
+Pipfile.lock
+package-lock.json
+npm-shrinkwrap.json
+yarn.lock
+pnpm-lock.yaml
+bun.lock
+bun.lockb
+
+# ---- Python --------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg
+*.egg-info/
+.eggs/
+build/
+dist/
+wheels/
+.installed.cfg
+.Python
+.venv/
+venv/
+env/
+ENV/
+.python-version
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.dmypy.json
+.pyre/
+.ipynb_checkpoints/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# ---- Node / npm / bun ----------------------------------------------------
+node_modules/
+.npm/
+.bun/
+.pnp.*
+.yarn/
+dist/
+build/
+
+# ---- Databricks ----------------------------------------------------------
+.databricks/
+.databricks-login.json
+
+# ---- IDE / editor caches -------------------------------------------------
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.history/
+
+# ---- Temp / scratch ------------------------------------------------------
+tmp/
+temp/
+*.tmp
+*.temp
+*.log
+*.bak
+*.cache
+
+# ---- OS cruft ------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+desktop.ini
